@@ -11,7 +11,7 @@
 
 # How to get started
 ```
-git clone https://github.com/kobakoba5884/my-workspace-for-java.git .
+git clone https://github.com/kobakoba5884/my-workspace.git .
 ```
 
 # Reference
