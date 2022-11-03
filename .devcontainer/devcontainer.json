@@ -28,7 +28,8 @@
 		"mhutchie.git-graph",
 		"ms-vsliveshare.vsliveshare",
 		"mtxr.sqltools-driver-pg",
-    "ms-vscode.live-server",
-    "amazonwebservices.aws-toolkit-vscode"
+		"ms-vscode.live-server",
+		"amazonwebservices.aws-toolkit-vscode",
+		"ms-python.python"
 	]
   }
