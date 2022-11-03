@@ -1,5 +1,5 @@
 {
-    "name": "java-workspace",
+    "name": "workspace",
     "dockerComposeFile": ["docker-compose.yml"],
     "service": "workspace",
     "workspaceFolder": "/home/vscode/workspace",
