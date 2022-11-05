@@ -30,6 +30,7 @@
 		"mtxr.sqltools-driver-pg",
 		"ms-vscode.live-server",
 		"amazonwebservices.aws-toolkit-vscode",
-		"ms-python.python"
+		"ms-python.python",
+    "mtxr.sqltools-driver-mysql"
 	]
   }
