@@ -18,7 +18,7 @@ services:
       TZ: ${TIME_ZONE:-Asia/Tokyo}
     volumes:
       - ../:/home/${USER_NAME:-vscode}/workspace:cached
-      - ~/.aws:/home/${USER_NAME:-vscode}/.aws:cached
+      - ~/.aws:/home/${USER_NAME:-vscode}/.aws
     ports:
       - 5555:5555
 
