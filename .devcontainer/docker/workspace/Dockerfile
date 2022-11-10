@@ -43,7 +43,7 @@ RUN su ${USER_NAME} --command \
     && sdk install gradle ${GRADLE_VERSION}'
 
 
-# ---------------------------------- pyenv for python----------------------------------
+# ---------------------------------- pyenv for python ----------------------------------
 # dependencies for pyenv
 ARG PYENV_DEP="make build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev wget llvm libncurses5-dev \
@@ -68,7 +68,7 @@ RUN apt-get install -y --no-install-recommends ${PYENV_DEP} \
     && pyenv global "${PYTHON_VERSION}" \
     '
 
-# ---------------------------------- install latest c c++ compiler ----------------------------------
+# ---------------------------------- latest c c++ compiler ----------------------------------
 # https://ja.linuxcapable.com/how-to-install-gcc-compiler-on-ubuntu-22-04-lts/
 # default gcc g++ version
 ARG LATEST_C_VERSION
@@ -87,7 +87,7 @@ RUN apt-get -y install locales \
     && echo "LANG=${LOCALE}" > /etc/locale.conf \
     && locale-gen ${LOCALE}
 
-# ---------------------------------- nvm ----------------------------------
+# ---------------------------------- nvm for javascript ----------------------------------
 # default node version
 ARG NODE_VERSION
 
