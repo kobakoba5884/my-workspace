@@ -7,7 +7,7 @@ ARG USER_UID
 ARG USER_GID
 
 # general packages
-ARG PKG="git vim curl unzip zip sudo tzdata"
+ARG PKG="vim curl unzip zip sudo tzdata git"
 
 SHELL ["/bin/bash", "-c"]
 
@@ -31,7 +31,7 @@ RUN su ${USER_NAME} --command \
     'sudo git config --system --add safe.directory "/home/${USER_NAME}/workspace"'
 
 
-# ---------------------------------- sdkman ----------------------------------
+# ---------------------------------- sdkman for java ----------------------------------
 # https://sdkman.io/install
 ARG JAVA_VERSION
 ARG GRADLE_VERSION
@@ -43,7 +43,7 @@ RUN su ${USER_NAME} --command \
     && sdk install gradle ${GRADLE_VERSION}'
 
 
-# ---------------------------------- pyenv ----------------------------------
+# ---------------------------------- pyenv for python----------------------------------
 # dependencies for pyenv
 ARG PYENV_DEP="make build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev wget llvm libncurses5-dev \
@@ -68,4 +68,32 @@ RUN apt-get install -y --no-install-recommends ${PYENV_DEP} \
     && pyenv global "${PYTHON_VERSION}" \
     '
 
+# ---------------------------------- install latest c c++ compiler ----------------------------------
+# https://ja.linuxcapable.com/how-to-install-gcc-compiler-on-ubuntu-22-04-lts/
+# default gcc g++ version
+ARG LATEST_C_VERSION
 
+RUN sudo apt-get -y install gcc-${LATEST_C_VERSION} g++-${LATEST_C_VERSION} \
+    && sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${LATEST_C_VERSION} ${LATEST_C_VERSION} \
+    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${LATEST_C_VERSION} ${LATEST_C_VERSION}
+
+# ---------------------------------- set up language ----------------------------------
+# setup locale https://stackoverflow.com/a/55077451/13723015
+ARG LOCALE
+
+RUN apt-get -y install locales \
+    && echo "LC_ALL=${LOCALE}" >> /etc/environment \
+    && echo "${LOCALE} UTF-8" >> /etc/locale.gen \
+    && echo "LANG=${LOCALE}" > /etc/locale.conf \
+    && locale-gen ${LOCALE}
+
+# ---------------------------------- nvm ----------------------------------
+# default node version
+ARG NODE_VERSION
+
+RUN su ${USER_NAME} --command \
+    'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
+    && source ~/.nvm/nvm.sh \
+    && nvm install "${NODE_VERSION}" \
+    && nvm alias default "${NODE_VERSION}" \
+    && nvm use default'
