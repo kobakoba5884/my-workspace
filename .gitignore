@@ -1,5 +1,4 @@
 .docker
-.vscode
 
 # clear cach command 
 # git rm -r --cached . 
