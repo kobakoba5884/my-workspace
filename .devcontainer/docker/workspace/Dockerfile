@@ -97,3 +97,14 @@ RUN su ${USER_NAME} --command \
     && nvm install "${NODE_VERSION}" \
     && nvm alias default "${NODE_VERSION}" \
     && nvm use default'
+
+# ---------------------------------- aws cli ----------------------------------
+
+ARG ZIP_FILE=awscliv2.zip
+
+RUN apt-get install -y less \
+    && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o ${ZIP_FILE} \
+    && unzip ${ZIP_FILE}  \
+    && ./aws/install \
+    && rm -f ${ZIP_FILE}
+
