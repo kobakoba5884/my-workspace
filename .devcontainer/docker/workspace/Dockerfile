@@ -6,6 +6,10 @@ ARG USER_GROUP_NAME
 ARG USER_UID
 ARG USER_GID
 
+LABEL maintainer="mizuki"
+LABEL version="1.0"
+LABEL description="my-workspace"
+
 # general packages
 ARG PKG="vim curl unzip zip sudo tzdata git"
 

@@ -17,7 +17,8 @@
       "liveshare.allowGuestDebugControl": true,
       "liveshare.allowGuestTaskControl": true,
       "liveshare.languages.allowGuestCommandControl": true,
-      "liveshare.publishWorkspaceInfo": true
+      "liveshare.publishWorkspaceInfo": true,
+      "liveshare.autoShareTerminals": true
     },
     "extensions": [
 		"vscjava.vscode-java-pack",
@@ -31,6 +32,9 @@
 		"ms-vscode.live-server",
 		"amazonwebservices.aws-toolkit-vscode",
 		"ms-python.python",
-    "mtxr.sqltools-driver-mysql"
+    "mtxr.sqltools-driver-mysql",
+    "esbenp.prettier-vscode",
+		"streetsidesoftware.code-spell-checker",
+		"ms-azuretools.vscode-docker"
 	]
   }
