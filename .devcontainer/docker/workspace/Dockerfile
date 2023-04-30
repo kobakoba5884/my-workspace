@@ -7,7 +7,7 @@ ARG USER_UID
 ARG USER_GID
 
 LABEL maintainer="mizuki"
-LABEL version="1.0"
+LABEL version="2.0"
 LABEL description="my-workspace"
 
 # general packages
@@ -27,12 +27,17 @@ RUN apt-get update \
     && echo %${USER_GROUP_NAME} ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/${USER_GROUP_NAME} \
     && chmod 0440 /etc/sudoers.d/${USER_GROUP_NAME}
 
+USER ${USER_NAME}
+
+ENV HOME=/home/${USER_NAME}
+
 # ---------------------------------- enable git ----------------------------------
 
 # https://github.com/devcontainers/cli/issues/98
 # change to main branch https://dev-yakuza.posstree.com/git/default-branch/
-RUN su ${USER_NAME} --command \
-    'sudo git config --system --add safe.directory "/home/${USER_NAME}/workspace"'
+RUN git config --global --add safe.directory "${HOME}/workspace" \
+    && git config --global user.name "${GIT_USER_NAME}" \
+    && git config --global user.email "${GIT_USER_EMAIL}"
 
 
 # ---------------------------------- sdkman for java ----------------------------------
@@ -40,11 +45,10 @@ RUN su ${USER_NAME} --command \
 ARG JAVA_VERSION
 ARG GRADLE_VERSION
 
-RUN su ${USER_NAME} --command \
-    'curl -s "https://get.sdkman.io" | bash \
+RUN curl -s "https://get.sdkman.io" | bash \
     && source "${HOME}/.sdkman/bin/sdkman-init.sh" \
     && sdk install java "${JAVA_VERSION}" \
-    && sdk install gradle ${GRADLE_VERSION}'
+    && sdk install gradle ${GRADLE_VERSION}
 
 
 # ---------------------------------- pyenv for python ----------------------------------
@@ -53,32 +57,47 @@ ARG PYENV_DEP="make build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev wget llvm libncurses5-dev \
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl"
 
+RUN sudo apt-get update -y \
+    && sudo apt-get install -y --no-install-recommends ${PYENV_DEP}
+
 # default python version
 ARG PYTHON_VERSION
+ARG SECOUND_PYTHON_VERSION
 
 ENV PYENV_ROOT=${HOME}/.pyenv
 
-RUN apt-get install -y --no-install-recommends ${PYENV_DEP} \
-    && su ${USER_NAME} --command \
-    # install pyenv https://k0nze.dev/posts/install-pyenv-venv-vscode
-    ' \
-    git clone https://github.com/pyenv/pyenv.git ${HOME}/.pyenv \
-    && echo "export PYENV_ROOT=\${HOME}/.pyenv" >> ${HOME}/.bashrc \
-    && echo "export PATH=\${PYENV_ROOT}/bin:\${PATH}" >> ${HOME}/.bashrc \
-    && echo "eval \"\$(pyenv init --path)\"" >> ${HOME}/.bashrc \
-    && export PYENV_ROOT=${HOME}/.pyenv \
-    && export PATH=${PYENV_ROOT}/bin:${PATH} \
+RUN curl https://pyenv.run | bash \
+    && echo 'export PYENV_ROOT="${HOME}/.pyenv"' >> ${HOME}/.bashrc \
+    && echo 'export PATH="${PYENV_ROOT}/bin:${PATH}"' >> ${HOME}/.bashrc \
+    && echo 'eval "$(pyenv init --path)"' >> ${HOME}/.bashrc \
+    && export PATH="${PYENV_ROOT}/bin:${PATH}" \
+    && eval "$(pyenv init --path)" \
     && pyenv install "${PYTHON_VERSION}" \
     && pyenv global "${PYTHON_VERSION}" \
-    '
+    && pyenv install "${SECOUND_PYTHON_VERSION}"
+
+# ---------------------------------- nvm for node ----------------------------------
+# default node version
+ARG NODE_VERSION
+
+ARG NODE_GLOBA_PKG="prettier"
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
+    && source ~/.nvm/nvm.sh \
+    && nvm install --lts \
+    && nvm alias default "${NODE_VERSION}" \
+    && nvm use default \
+    && npm i --global ${NODE_GLOBA_PKG}
+
+USER root
 
 # ---------------------------------- latest c c++ compiler ----------------------------------
 # https://ja.linuxcapable.com/how-to-install-gcc-compiler-on-ubuntu-22-04-lts/
 # default gcc g++ version
 ARG LATEST_C_VERSION
 
-RUN sudo apt-get -y install gcc-${LATEST_C_VERSION} g++-${LATEST_C_VERSION} \
-    && sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${LATEST_C_VERSION} ${LATEST_C_VERSION} \
+RUN apt-get -y install gcc-${LATEST_C_VERSION} g++-${LATEST_C_VERSION} \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${LATEST_C_VERSION} ${LATEST_C_VERSION} \
     && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${LATEST_C_VERSION} ${LATEST_C_VERSION}
 
 # ---------------------------------- set up language ----------------------------------
@@ -91,24 +110,28 @@ RUN apt-get -y install locales \
     && echo "LANG=${LOCALE}" > /etc/locale.conf \
     && locale-gen ${LOCALE}
 
-# ---------------------------------- nvm for javascript ----------------------------------
-# default node version
-ARG NODE_VERSION
-
-RUN su ${USER_NAME} --command \
-    'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
-    && source ~/.nvm/nvm.sh \
-    && nvm install "${NODE_VERSION}" \
-    && nvm alias default "${NODE_VERSION}" \
-    && nvm use default'
-
 # ---------------------------------- aws cli ----------------------------------
 
 ARG ZIP_FILE=awscliv2.zip
 
 RUN apt-get install -y less \
     && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o ${ZIP_FILE} \
-    && unzip ${ZIP_FILE}  \
+    && unzip ${ZIP_FILE} \
     && ./aws/install \
     && rm -f ${ZIP_FILE}
 
+# ---------------------------------- github cli ----------------------------------
+
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update \
+    && apt-get install gh -y \
+    && gh --version
+
+# ---------------------------------- addtional packages ----------------------------------
+
+ARG ADDITONAL_PKG="iputils-ping"
+
+RUN apt-get update -y \
+    && apt-get install ${ADDITONAL_PKG} -y
