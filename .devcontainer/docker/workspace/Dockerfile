@@ -35,9 +35,7 @@ ENV HOME=/home/${USER_NAME}
 
 # https://github.com/devcontainers/cli/issues/98
 # change to main branch https://dev-yakuza.posstree.com/git/default-branch/
-RUN git config --global --add safe.directory "${HOME}/workspace" \
-    && git config --global user.name "${GIT_USER_NAME}" \
-    && git config --global user.email "${GIT_USER_EMAIL}"
+RUN git config --global --add safe.directory "${HOME}/workspace"
 
 
 # ---------------------------------- sdkman for java ----------------------------------

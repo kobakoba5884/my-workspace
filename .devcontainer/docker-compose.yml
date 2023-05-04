@@ -33,7 +33,7 @@ services:
     container_name: ${PROJECT_NAME:-original}-postgres
     image: postgres:10
     environment:
-      POSTGRES_USER: ${DB_USER:-}
+      POSTGRES_USER: ${DB_USER:-dbuser}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-thisIsReallyStrongPassword123}
       POSTGRES_DB: ${DB_NAME:-dev}
     ports:
