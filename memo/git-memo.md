@@ -1,13 +1,17 @@
 <h1 align="center">memo-for-git-command</h1>
 
 # command 
+
 ***
 - when .gitignore is not working at workspace directory.
 
 ```
     git rm -r --cached . 
 ```
-<h2 align="center">branch</h1><!-- https://www.sejuku.net/blog/71612 -->
+
+<!-- https://www.sejuku.net/blog/71612 -->
+<h2 align="center">branch</h1>
+
 - show branch list.
 
 ```
