@@ -87,6 +87,18 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
     && nvm use default \
     && npm i --global ${NODE_GLOBA_PKG}
 
+# ---------------------------------- Go setup ----------------------------------
+
+ARG GO_VERSION
+
+RUN sudo curl -sSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -o go${GO_VERSION}.linux-amd64.tar.gz \
+    && sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz \
+    && sudo rm -f go${GO_VERSION}.linux-amd64.tar.gz \
+    && echo 'export GOROOT="/usr/local/go"' >> ${HOME}/.bashrc \
+    && echo 'export GOPATH="${HOME}/go"' >> ${HOME}/.bashrc \
+    && echo 'export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"' >> ${HOME}/.bashrc \
+    && source ${HOME}/.bashrc
+
 USER root
 
 # ---------------------------------- latest c c++ compiler ----------------------------------
@@ -126,6 +138,16 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     && apt-get update \
     && apt-get install gh -y \
     && gh --version
+
+# ---------------------------------- aws sam cli ----------------------------------
+
+ARG SAM_ZIP_FILE=aws-sam-cli-linux-x86_64.zip
+
+RUN curl -sSL https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip -o ${SAM_ZIP_FILE} \
+    && unzip ${SAM_ZIP_FILE} -d sam-installation \
+    && ./sam-installation/install \
+    && rm -f ${SAM_ZIP_FILE} \
+    && sam --version
 
 # ---------------------------------- addtional packages ----------------------------------
 
