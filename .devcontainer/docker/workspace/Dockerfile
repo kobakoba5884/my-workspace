@@ -91,13 +91,19 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | b
 
 ARG GO_VERSION
 
-RUN sudo curl -sSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -o go${GO_VERSION}.linux-amd64.tar.gz \
-    && sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz \
-    && sudo rm -f go${GO_VERSION}.linux-amd64.tar.gz \
-    && echo 'export GOROOT="/usr/local/go"' >> ${HOME}/.bashrc \
+ENV GVM_ROOT ${HOME}/.gvm
+
+RUN bash < <(curl -sSL https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer) \
+    && echo 'export GVM_ROOT="${GVM_ROOT}"' >> ${HOME}/.bashrc \
     && echo 'export GOPATH="${HOME}/go"' >> ${HOME}/.bashrc \
     && echo 'export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"' >> ${HOME}/.bashrc \
-    && source ${HOME}/.bashrc
+    && sudo apt-get install bison -y \
+    && source ${GVM_ROOT}/scripts/gvm \
+    && gvm install go1.4 -B \
+    && gvm use go1.4 \
+    && echo 'GOROOT_BOOTSTRAP="$GOROOT"' >> ${HOME}/.bashrc \
+    && gvm install go${GO_VERSION} \
+    && gvm use go${GO_VERSION} --default
 
 USER root
 

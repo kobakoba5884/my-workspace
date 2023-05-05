@@ -16,7 +16,7 @@ services:
         SECOUND_PYTHON_VERSION: ${SECOUND_PYTHON_VERSION:-3.9.6}
         LATEST_C_VERSION: ${LATEST_C_VERSION:-12}
         NODE_VERSION: ${NODE_VERSION:-v18.12.1}
-        GO_VERSION: ${GO_VERSION:-1.20.4}
+        GO_VERSION: ${GO_VERSION:-1.16}
         LOCALE: ${LOCALE:-en_US.UTF-8}
     tty: true
     environment:
