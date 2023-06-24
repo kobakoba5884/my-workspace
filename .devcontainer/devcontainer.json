@@ -5,6 +5,13 @@
   "workspaceFolder": "/home/vscode/workspace",
   "remoteUser": "vscode",
   "shutdownAction": "stopCompose",
+  "features": {
+    "docker-from-docker": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  },
   // https://github.com/redhat-developer/vscode-java/issues/1156
   "customizations": {
     "vscode": {
@@ -21,29 +28,29 @@
         "liveshare.autoShareTerminals": true
       },
       "extensions": [
-		"vscjava.vscode-java-pack",
-		"vscjava.vscode-gradle",
-		"vscjava.vscode-spring-initializr",
-		"rangav.vscode-thunder-client",
-		"mtxr.sqltools",
-		"ms-vsliveshare.vsliveshare",
-		"mtxr.sqltools-driver-pg",
-		"ms-vscode.live-server",
-		"amazonwebservices.aws-toolkit-vscode",
-		"ms-python.python",
-		"mtxr.sqltools-driver-mysql",
-		"esbenp.prettier-vscode",
-		"streetsidesoftware.code-spell-checker",
-		"ms-azuretools.vscode-docker",
-		"oderwat.indent-rainbow",
-		"mosapride.zenkaku",
-		"dbaeumer.vscode-eslint",
-		"mongodb.mongodb-vscode",
-		"Swellaby.node-pack",
-		"eamodio.gitlens",
-		"GitHub.vscode-pull-request-github",
-		"golang.go"
-	]
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
+        "vscjava.vscode-spring-initializr",
+        "rangav.vscode-thunder-client",
+        "mtxr.sqltools",
+        "ms-vsliveshare.vsliveshare",
+        "mtxr.sqltools-driver-pg",
+        "ms-vscode.live-server",
+        "amazonwebservices.aws-toolkit-vscode",
+        "ms-python.python",
+        "mtxr.sqltools-driver-mysql",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "ms-azuretools.vscode-docker",
+        "oderwat.indent-rainbow",
+        "mosapride.zenkaku",
+        "dbaeumer.vscode-eslint",
+        "mongodb.mongodb-vscode",
+        "Swellaby.node-pack",
+        "eamodio.gitlens",
+        "GitHub.vscode-pull-request-github",
+        "golang.go"
+      ]
     }
   }
 }

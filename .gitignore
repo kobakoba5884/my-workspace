@@ -1,4 +1,6 @@
-.docker
+.docker/
+.git/
+.env
 
 # clear cach command 
 # git rm -r --cached . 

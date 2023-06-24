@@ -33,9 +33,15 @@ ENV HOME=/home/${USER_NAME}
 
 # ---------------------------------- enable git ----------------------------------
 
+ARG GIT_USER
+ARG GIT_EMAIL
+
 # https://github.com/devcontainers/cli/issues/98
 # change to main branch https://dev-yakuza.posstree.com/git/default-branch/
-RUN git config --global --add safe.directory "${HOME}/workspace"
+RUN git config --global --add safe.directory "${HOME}/workspace" \
+    && git config --global init.defaultBranch main \
+    && git config --global user.name "${GIT_USER}" \
+    && git config --global user.email "${GIT_EMAIL}"
 
 
 # ---------------------------------- sdkman for java ----------------------------------
@@ -74,36 +80,38 @@ RUN curl https://pyenv.run | bash \
     && pyenv global "${PYTHON_VERSION}" \
     && pyenv install "${SECOUND_PYTHON_VERSION}"
 
-# ---------------------------------- nvm for node ----------------------------------
+# ---------------------------------- nvm for node and cdk ----------------------------------
 # default node version
 ARG NODE_VERSION
 
-ARG NODE_GLOBA_PKG="prettier"
+ARG NODE_GLOBAL_PKG="prettier cdk"
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
     && source ~/.nvm/nvm.sh \
     && nvm install --lts \
     && nvm alias default "${NODE_VERSION}" \
     && nvm use default \
-    && npm i --global ${NODE_GLOBA_PKG}
+    && npm update -g \
+    && npm i --global ${NODE_GLOBAL_PKG}
 
-# ---------------------------------- Go setup ----------------------------------
+# ---------------------------------- gvm for go ----------------------------------
 
 ARG GO_VERSION
 
 ENV GVM_ROOT ${HOME}/.gvm
+ENV GOPATH ${HOME}/GO_VERSION
+ENV GOROOT ${GVM_ROOT}/gos/go${GO_VERSION}
 
 RUN bash < <(curl -sSL https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer) \
-    && echo 'export GVM_ROOT="${GVM_ROOT}"' >> ${HOME}/.bashrc \
-    && echo 'export GOPATH="${HOME}/go"' >> ${HOME}/.bashrc \
     && echo 'export PATH="${GOROOT}/bin:${GOPATH}/bin:${PATH}"' >> ${HOME}/.bashrc \
     && sudo apt-get install bison -y \
     && source ${GVM_ROOT}/scripts/gvm \
     && gvm install go1.4 -B \
     && gvm use go1.4 \
-    && echo 'GOROOT_BOOTSTRAP="$GOROOT"' >> ${HOME}/.bashrc \
     && gvm install go${GO_VERSION} \
-    && gvm use go${GO_VERSION} --default
+    && gvm use go${GO_VERSION} --default \
+    && go install -v golang.org/x/tools/gopls@latest \
+    && go install -v github.com/go-delve/delve/cmd/dlv@latest
 
 USER root
 
@@ -119,6 +127,9 @@ RUN apt-get -y install gcc-${LATEST_C_VERSION} g++-${LATEST_C_VERSION} \
 # ---------------------------------- set up language ----------------------------------
 # setup locale https://stackoverflow.com/a/55077451/13723015
 ARG LOCALE
+ENV LOCALE=${LOCALE}
+ENV LC_ALL=${LOCALE}
+ENV LANG=${LOCALE}
 
 RUN apt-get -y install locales \
     && echo "LC_ALL=${LOCALE}" >> /etc/environment \
@@ -129,12 +140,16 @@ RUN apt-get -y install locales \
 # ---------------------------------- aws cli ----------------------------------
 
 ARG ZIP_FILE=awscliv2.zip
+ARG BE_PATH_TO_COMPLETER=/usr/local/bin
 
 RUN apt-get install -y less \
     && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o ${ZIP_FILE} \
     && unzip ${ZIP_FILE} \
     && ./aws/install \
-    && rm -f ${ZIP_FILE}
+    && rm -f ${ZIP_FILE} \
+    && echo 'export PATH="${BE_PATH_TO_COMPLETER}:${PATH}"' >> ${HOME}/.bashrc \
+    && source ${HOME}/.bashrc \
+    && complete -C "${BE_PATH_TO_COMPLETER}/aws_completer" aws
 
 # ---------------------------------- github cli ----------------------------------
 
@@ -157,7 +172,9 @@ RUN curl -sSL https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sa
 
 # ---------------------------------- addtional packages ----------------------------------
 
-ARG ADDITONAL_PKG="iputils-ping"
+ARG ADDITONAL_PKG="iputils-ping lsof"
 
 RUN apt-get update -y \
-    && apt-get install ${ADDITONAL_PKG} -y
+    && apt-get install ${ADDITONAL_PKG} -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
