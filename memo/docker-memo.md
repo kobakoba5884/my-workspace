@@ -13,3 +13,10 @@
             --format string   Pretty-print images using a Go template
             --no-trunc        Don't truncate output
         -q, --quiet           Only show image IDs
+
+***
+- all delete
+
+```
+    docker system prune --all --force --volumes
+```
